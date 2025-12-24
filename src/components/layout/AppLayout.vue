@@ -14,6 +14,7 @@ import { usePermissions } from '@/composables/usePermissions'
 import IconBase from '../base/IconBase.vue'
 import BaseButton from '../base/BaseButton.vue'
 import BaseDropdown from '../base/BaseDropdown.vue'
+import NotificationDropdown from '../notifications/NotificationDropdown.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -76,6 +77,12 @@ const navigationItems = computed(() => {
       path: '/integrations',
       icon: 'link',
       show: permissions.canViewIntegrations.value
+    },
+    {
+      name: 'Notifications',
+      path: '/notifications',
+      icon: 'bell',
+      show: true
     },
     {
       name: 'Settings',
@@ -203,15 +210,22 @@ const handleLogout = () => {
           </button>
           
           <!-- Notifications -->
-          <button
-            class="app-layout__header-action"
-            @click="navigateTo('/notifications')"
-          >
-            <IconBase name="bell" :size="20" />
-            <span v-if="unreadCount > 0" class="app-layout__badge">
-              {{ unreadCount > 99 ? '99+' : unreadCount }}
-            </span>
-          </button>
+          <div class="app-layout__notifications-wrapper">
+            <BaseDropdown placement="bottom-end" trigger="click">
+              <template #trigger>
+                <button class="app-layout__header-action">
+                  <IconBase name="bell" :size="20" />
+                  <span v-if="unreadCount > 0" class="app-layout__badge">
+                    {{ unreadCount > 99 ? '99+' : unreadCount }}
+                  </span>
+                </button>
+              </template>
+              
+              <template #default>
+                <NotificationDropdown />
+              </template>
+            </BaseDropdown>
+          </div>
           
           <!-- User Menu -->
           <BaseDropdown placement="bottom-end">
@@ -235,7 +249,7 @@ const handleLogout = () => {
               
               <button
                 class="app-layout__user-menu-item"
-                @click="navigateTo('/settings/profile')"
+                @click="navigateTo('/profile')"
               >
                 <IconBase name="user" :size="18" />
                 <span>Profile</span>
@@ -611,6 +625,13 @@ const handleLogout = () => {
   height: 1px;
   background-color: rgb(var(--color-border));
   margin: var(--spacing-xs) 0;
+}
+
+.app-layout__notifications-wrapper :deep(.base-dropdown__menu) {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 
 .app-layout__content {

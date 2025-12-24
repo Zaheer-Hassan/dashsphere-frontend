@@ -49,6 +49,15 @@ const routes = [
     }
   },
   {
+    path: '/notifications',
+    name: 'Notifications',
+    component: () => import('@/views/notifications/NotificationsView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Notifications'
+    }
+  },
+  {
     path: '/users',
     name: 'Users',
     component: () => import('@/views/users/UsersView.vue'),
@@ -86,6 +95,15 @@ const routes = [
       requiresAuth: true,
       permissions: [PERMISSIONS.INTEGRATIONS_VIEW],
       title: 'Integrations'
+    }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/views/settings/ProfileView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Profile'
     }
   },
   {
