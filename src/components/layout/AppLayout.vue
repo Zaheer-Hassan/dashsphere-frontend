@@ -55,7 +55,7 @@ const navigationItems = computed(() => {
       show: permissions.canViewAnalytics.value
     },
     {
-      name: 'Users',
+      name: 'User Management',
       path: '/users',
       icon: 'users',
       show: permissions.canViewUsers.value

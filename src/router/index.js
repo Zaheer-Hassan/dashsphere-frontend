@@ -165,13 +165,14 @@ router.beforeEach(async (to, from, next) => {
   }
   
   // Redirect to login if not authenticated
-  if (requiresAuth && !isAuthenticated) {
-    next({
-      name: 'Login',
-      query: { redirect: to.fullPath }
-    })
-    return
-  }
+  // TEMPORARILY DISABLED FOR DEVELOPMENT - Page refresh won't redirect to login
+  // if (requiresAuth && !isAuthenticated) {
+  //   next({
+  //     name: 'Login',
+  //     query: { redirect: to.fullPath }
+  //   })
+  //   return
+  // }
   
   // Redirect to dashboard if authenticated and trying to access auth pages
   if (!requiresAuth && isAuthenticated && ['Login', 'Register'].includes(to.name)) {

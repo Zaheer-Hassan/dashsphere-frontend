@@ -94,7 +94,25 @@ export const useAuthStore = defineStore('auth', () => {
     if (storedToken) {
       token.value = storedToken
       refreshToken.value = storedRefreshToken
-      // In a real app, you'd validate the token and fetch user data
+    }
+    
+    // TEMPORARILY: Always set default user for development (no redirect on refresh)
+    // This allows the app to work without authentication during development
+    // In a real app, you'd validate the token and fetch user data from API
+    if (!user.value) {
+      setUser({
+        id: '1',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        role: USER_ROLES.TENANT_ADMIN,
+        permissions: [],
+        tenantId: 'tenant-1',
+        avatar: null
+      })
+      // Set token if not already set
+      if (!token.value) {
+        token.value = 'dev-token'
+      }
     }
   }
   
