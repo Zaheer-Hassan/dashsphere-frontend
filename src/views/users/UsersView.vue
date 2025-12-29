@@ -1071,15 +1071,17 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   color: rgb(var(--color-text-secondary));
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all var(--transition-fast) ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .users-management-view__tab:hover {
@@ -1094,7 +1096,7 @@ onMounted(() => {
 
 .users-management-view__content {
   background-color: rgb(var(--color-surface));
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   border: 1px solid rgb(var(--color-border));
   padding: var(--spacing-xl);
 }

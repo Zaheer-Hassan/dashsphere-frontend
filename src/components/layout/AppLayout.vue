@@ -55,19 +55,19 @@ const navigationItems = computed(() => {
       show: permissions.canViewAnalytics.value
     },
     {
-      name: 'User Management',
+      name: 'Users Management',
       path: '/users',
       icon: 'users',
       show: permissions.canViewUsers.value
     },
     {
-      name: 'Tenants',
+      name: 'Tenant / Organization',
       path: '/tenants',
       icon: 'folder',
       show: permissions.canViewTenants.value
     },
     {
-      name: 'Billing',
+      name: 'Billing / Subscription',
       path: '/billing',
       icon: 'credit-card',
       show: permissions.canViewBilling.value

@@ -104,9 +104,9 @@ export const useAuthStore = defineStore('auth', () => {
         id: '1',
         name: 'John Doe',
         email: 'john.doe@example.com',
-        role: USER_ROLES.TENANT_ADMIN,
+        role: USER_ROLES.SUPER_ADMIN,
         permissions: [],
-        tenantId: 'tenant-1',
+        tenantId: null, // Super admin doesn't belong to a tenant
         avatar: null
       })
       // Set token if not already set

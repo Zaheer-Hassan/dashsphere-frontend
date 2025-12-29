@@ -39,6 +39,9 @@ export function usePermissions() {
   ]))
   
   const canViewTenants = computed(() => can(PERMISSIONS.TENANTS_VIEW))
+  const canCreateTenants = computed(() => can(PERMISSIONS.TENANTS_CREATE))
+  const canEditTenants = computed(() => can(PERMISSIONS.TENANTS_EDIT))
+  const canDeleteTenants = computed(() => can(PERMISSIONS.TENANTS_DELETE))
   const canManageTenants = computed(() => canAny([
     PERMISSIONS.TENANTS_CREATE,
     PERMISSIONS.TENANTS_EDIT,
@@ -77,6 +80,9 @@ export function usePermissions() {
     
     // Tenant permissions
     canViewTenants,
+    canCreateTenants,
+    canEditTenants,
+    canDeleteTenants,
     canManageTenants,
     
     // Settings permissions
