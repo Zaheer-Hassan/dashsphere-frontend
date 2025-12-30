@@ -1,30 +1,52 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+/**
+ * Root App Component
+ */
+
+import { onMounted } from 'vue'
+import { RouterView } from 'vue-router'
+import BaseSnackbar from './components/base/BaseSnackbar.vue'
+import { useAuthStore } from './stores/auth'
+import { useTenantStore } from './stores/tenant'
+
+const authStore = useAuthStore()
+const tenantStore = useTenantStore()
+
+onMounted(() => {
+  // Initialize authentication state first
+  authStore.loadFromStorage()
+  
+  // Initialize tenant context from user's tenantId
+  // For tenant users: Set tenant from user data
+  // For super-admin: tenant remains null (can see all tenants)
+  const user = authStore.user
+  
+  if (user?.tenantId) {
+    // User belongs to a tenant - set tenant context
+    tenantStore.setCurrentTenant({
+      id: user.tenantId,
+      name: user.tenantName || 'Current Tenant',
+      slug: user.tenantSlug || user.tenantId,
+      settings: user.tenantSettings || {},
+      features: user.tenantFeatures || [],
+      limits: user.tenantLimits || {},
+      theme: user.tenantTheme || {},
+      subscription: user.tenantSubscription || null
+    })
+  } else {
+    // Super-admin or no tenant - clear tenant context
+    tenantStore.clearTenant()
+  }
+})
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div id="app">
+    <RouterView />
+    <BaseSnackbar />
   </div>
-  <HelloWorld msg="Vite + Vue DashSphere" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+<style>
+/* Global styles are in style.css */
 </style>
