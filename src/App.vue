@@ -13,31 +13,29 @@ const authStore = useAuthStore()
 const tenantStore = useTenantStore()
 
 onMounted(() => {
-  // Initialize authentication state
+  // Initialize authentication state first
   authStore.loadFromStorage()
   
-  // Initialize tenant context
-  tenantStore.loadTenantFromStorage()
+  // Initialize tenant context from user's tenantId
+  // For tenant users: Set tenant from user data
+  // For super-admin: tenant remains null (can see all tenants)
+  const user = authStore.user
   
-  // Set mock tenant for demo purposes
-  if (!tenantStore.currentTenant) {
+  if (user?.tenantId) {
+    // User belongs to a tenant - set tenant context
     tenantStore.setCurrentTenant({
-      id: 'tenant-1',
-      name: 'Acme Corporation',
-      slug: 'acme',
-      settings: {},
-      features: ['analytics', 'integrations', 'advanced_reporting'],
-      limits: {
-        maxUsers: 50,
-        maxStorage: 100,
-        maxApiCalls: 100000
-      },
-      theme: {},
-      subscription: {
-        plan: 'Professional',
-        status: 'active'
-      }
+      id: user.tenantId,
+      name: user.tenantName || 'Current Tenant',
+      slug: user.tenantSlug || user.tenantId,
+      settings: user.tenantSettings || {},
+      features: user.tenantFeatures || [],
+      limits: user.tenantLimits || {},
+      theme: user.tenantTheme || {},
+      subscription: user.tenantSubscription || null
     })
+  } else {
+    // Super-admin or no tenant - clear tenant context
+    tenantStore.clearTenant()
   }
 })
 </script>

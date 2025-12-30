@@ -11,10 +11,17 @@ import BaseModal from '@/components/modals/BaseModal.vue'
 import IconBase from '@/components/base/IconBase.vue'
 import { usePermissions } from '@/composables/usePermissions'
 import { useNotifications } from '@/composables/useNotifications'
+import { useAuthStore } from '@/stores/auth'
+import { useTenantStore } from '@/stores/tenant'
 import { USER_ROLES, PERMISSIONS, ROLE_PERMISSIONS } from '@/constants'
 
 const permissions = usePermissions()
 const { showSuccess, showError } = useNotifications()
+const authStore = useAuthStore()
+const tenantStore = useTenantStore()
+
+// Check if current user is super-admin
+const isSuperAdmin = computed(() => authStore.userRole === USER_ROLES.SUPER_ADMIN)
 
 // Tab state
 const activeTab = ref('users')
@@ -61,17 +68,38 @@ const itemsPerPage = 10
 const filteredUsers = computed(() => {
   let filtered = users.value
 
+  // TENANT ISOLATION: Filter by tenant if not super-admin
+  // Super-admin can see all users across all tenants
+  // Tenant admins/users can only see users from their own tenant
+  if (!isSuperAdmin.value && authStore.userTenantId) {
+    filtered = filtered.filter(user => {
+      // Super-admin users are visible to super-admin only
+      if (user.userType === 'super_admin') return false
+      // Show tenant users from the same tenant
+      return user.tenantId === authStore.userTenantId
+    })
+  } else if (isSuperAdmin.value) {
+    // Super-admin can see all users (both super-admin and tenant users)
+    // Optionally filter by tenant if tenant filter is selected
+    if (userTypeFilter.value === 'tenant_user') {
+      filtered = filtered.filter(user => user.userType === 'tenant_user')
+    } else if (userTypeFilter.value === 'super_admin') {
+      filtered = filtered.filter(user => user.userType === 'super_admin')
+    }
+  }
+
   // Search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(user => 
       user.name.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query)
+      user.email.toLowerCase().includes(query) ||
+      (user.tenantName && user.tenantName.toLowerCase().includes(query))
     )
   }
 
-  // User type filter
-  if (userTypeFilter.value !== 'all') {
+  // User type filter (for super-admin)
+  if (userTypeFilter.value !== 'all' && isSuperAdmin.value) {
     filtered = filtered.filter(user => user.userType === userTypeFilter.value)
   }
 
@@ -211,17 +239,20 @@ const sendInvite = async () => {
     // Dummy API call
     await new Promise(resolve => setTimeout(resolve, 500))
     
-    // Add pending user
+    // Add pending user with tenant context
     users.value.push({
       id: Date.now(),
       name: 'Pending',
       email: inviteForm.value.email,
       role: inviteForm.value.role,
       userType: 'tenant_user',
+      tenantId: authStore.userTenantId || tenantStore.tenantId,
+      tenantName: tenantStore.tenantName || 'Current Tenant',
       status: 'pending',
       avatar: null,
       lastLogin: null,
-      invitedAt: new Date().toISOString()
+      invitedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
     })
 
     showSuccess(`Invitation sent to ${inviteForm.value.email}`)
@@ -381,16 +412,27 @@ const saveRole = async () => {
 
 // Data loading
 const loadUsers = () => {
+  // In a real app, this would be an API call filtered by tenant
+  // For super-admin: fetch all users
+  // For tenant admin: fetch only users from their tenant
+  
+  // Get current user's tenant ID
+  const currentTenantId = authStore.userTenantId
+  
   users.value = [
+    // Tenant 1 Users
     {
       id: 1,
       name: 'John Doe',
       email: 'john.doe@example.com',
       role: USER_ROLES.TENANT_ADMIN,
       userType: 'tenant_user',
+      tenantId: 'tenant-1',
+      tenantName: 'Acme Corporation',
       status: 'active',
       avatar: null,
-      lastLogin: '2024-01-15T10:30:00Z'
+      lastLogin: '2024-01-15T10:30:00Z',
+      createdAt: '2023-06-01T00:00:00Z'
     },
     {
       id: 2,
@@ -398,9 +440,12 @@ const loadUsers = () => {
       email: 'jane.smith@example.com',
       role: USER_ROLES.MANAGER,
       userType: 'tenant_user',
+      tenantId: 'tenant-1',
+      tenantName: 'Acme Corporation',
       status: 'active',
       avatar: null,
-      lastLogin: '2024-01-15T09:15:00Z'
+      lastLogin: '2024-01-15T09:15:00Z',
+      createdAt: '2023-07-15T00:00:00Z'
     },
     {
       id: 3,
@@ -408,9 +453,12 @@ const loadUsers = () => {
       email: 'bob.johnson@example.com',
       role: USER_ROLES.USER,
       userType: 'tenant_user',
+      tenantId: 'tenant-1',
+      tenantName: 'Acme Corporation',
       status: 'active',
       avatar: null,
-      lastLogin: '2024-01-14T16:45:00Z'
+      lastLogin: '2024-01-14T16:45:00Z',
+      createdAt: '2023-08-20T00:00:00Z'
     },
     {
       id: 4,
@@ -418,19 +466,12 @@ const loadUsers = () => {
       email: 'alice.williams@example.com',
       role: USER_ROLES.VIEWER,
       userType: 'tenant_user',
+      tenantId: 'tenant-1',
+      tenantName: 'Acme Corporation',
       status: 'active',
       avatar: null,
-      lastLogin: '2024-01-14T14:20:00Z'
-    },
-    {
-      id: 5,
-      name: 'Super Admin',
-      email: 'admin@platform.com',
-      role: USER_ROLES.SUPER_ADMIN,
-      userType: 'super_admin',
-      status: 'active',
-      avatar: null,
-      lastLogin: '2024-01-15T11:00:00Z'
+      lastLogin: '2024-01-14T14:20:00Z',
+      createdAt: '2023-09-10T00:00:00Z'
     },
     {
       id: 6,
@@ -438,9 +479,12 @@ const loadUsers = () => {
       email: 'charlie.brown@example.com',
       role: USER_ROLES.USER,
       userType: 'tenant_user',
+      tenantId: 'tenant-1',
+      tenantName: 'Acme Corporation',
       status: 'inactive',
       avatar: null,
-      lastLogin: '2024-01-10T08:30:00Z'
+      lastLogin: '2024-01-10T08:30:00Z',
+      createdAt: '2023-10-05T00:00:00Z'
     },
     {
       id: 7,
@@ -448,9 +492,12 @@ const loadUsers = () => {
       email: 'diana.prince@example.com',
       role: USER_ROLES.MANAGER,
       userType: 'tenant_user',
+      tenantId: 'tenant-1',
+      tenantName: 'Acme Corporation',
       status: 'active',
       avatar: null,
-      lastLogin: '2024-01-15T07:20:00Z'
+      lastLogin: '2024-01-15T07:20:00Z',
+      createdAt: '2023-11-12T00:00:00Z'
     },
     {
       id: 8,
@@ -458,20 +505,71 @@ const loadUsers = () => {
       email: 'pending@example.com',
       role: USER_ROLES.USER,
       userType: 'tenant_user',
+      tenantId: 'tenant-1',
+      tenantName: 'Acme Corporation',
       status: 'pending',
       avatar: null,
       lastLogin: null,
-      invitedAt: '2024-01-12T12:00:00Z'
+      invitedAt: '2024-01-12T12:00:00Z',
+      createdAt: '2024-01-12T12:00:00Z'
+    },
+    // Tenant 2 Users (visible to super-admin only)
+    {
+      id: 9,
+      name: 'Sarah Connor',
+      email: 'sarah.connor@techcorp.com',
+      role: USER_ROLES.TENANT_ADMIN,
+      userType: 'tenant_user',
+      tenantId: 'tenant-2',
+      tenantName: 'TechCorp Inc',
+      status: 'active',
+      avatar: null,
+      lastLogin: '2024-01-15T08:00:00Z',
+      createdAt: '2023-05-01T00:00:00Z'
+    },
+    {
+      id: 10,
+      name: 'Mike Wilson',
+      email: 'mike.wilson@techcorp.com',
+      role: USER_ROLES.MANAGER,
+      userType: 'tenant_user',
+      tenantId: 'tenant-2',
+      tenantName: 'TechCorp Inc',
+      status: 'active',
+      avatar: null,
+      lastLogin: '2024-01-14T17:30:00Z',
+      createdAt: '2023-06-15T00:00:00Z'
+    },
+    // Super Admin Users
+    {
+      id: 5,
+      name: 'Super Admin',
+      email: 'admin@platform.com',
+      role: USER_ROLES.SUPER_ADMIN,
+      userType: 'super_admin',
+      tenantId: null,
+      tenantName: null,
+      status: 'active',
+      avatar: null,
+      lastLogin: '2024-01-15T11:00:00Z',
+      createdAt: '2023-01-01T00:00:00Z'
     }
   ]
 }
 
 const loadRoles = () => {
+  // Roles are tenant-specific
+  // Super-admin can see all roles across tenants
+  // Tenant admins can only see roles from their tenant
+  const currentTenantId = authStore.userTenantId || tenantStore.tenantId
+  
   roles.value = [
     {
       id: 'custom-1',
       name: 'Content Manager',
       description: 'Can manage content and view analytics',
+      tenantId: currentTenantId,
+      tenantName: tenantStore.tenantName || 'Current Tenant',
       permissions: [
         PERMISSIONS.ANALYTICS_VIEW,
         PERMISSIONS.SETTINGS_VIEW,
@@ -484,6 +582,8 @@ const loadRoles = () => {
       id: 'custom-2',
       name: 'Support Agent',
       description: 'Can view users and manage notifications',
+      tenantId: currentTenantId,
+      tenantName: tenantStore.tenantName || 'Current Tenant',
       permissions: [
         PERMISSIONS.USERS_VIEW,
         PERMISSIONS.NOTIFICATIONS_VIEW,
@@ -493,6 +593,11 @@ const loadRoles = () => {
       userCount: 1
     }
   ]
+  
+  // Filter roles by tenant if not super-admin
+  if (!isSuperAdmin.value && currentTenantId) {
+    roles.value = roles.value.filter(role => role.tenantId === currentTenantId)
+  }
 }
 
 // Utility functions
@@ -663,6 +768,7 @@ onMounted(() => {
             <thead>
               <tr>
                 <th>User</th>
+                <th v-if="isSuperAdmin">Tenant</th>
                 <th>Type</th>
                 <th>Role</th>
                 <th>Status</th>
@@ -686,6 +792,14 @@ onMounted(() => {
                         <div class="users-management-view__user-email">{{ user.email }}</div>
                       </div>
                     </div>
+                  </td>
+                  <td v-if="isSuperAdmin">
+                    <span v-if="user.tenantName" class="users-management-view__tenant-name">
+                      {{ user.tenantName }}
+                    </span>
+                    <span v-else class="users-management-view__tenant-name users-management-view__tenant-name--none">
+                      Platform
+                    </span>
                   </td>
                   <td>
                     <span
@@ -749,7 +863,7 @@ onMounted(() => {
               </template>
               <template v-else>
                 <tr>
-                  <td colspan="6" class="users-management-view__empty">
+                  <td :colspan="isSuperAdmin ? 7 : 6" class="users-management-view__empty">
                     <IconBase name="users" :size="48" />
                     <p>No users found</p>
                   </td>
@@ -1177,6 +1291,17 @@ onMounted(() => {
 .users-management-view__user-email {
   font-size: var(--font-size-sm);
   color: rgb(var(--color-text-secondary));
+}
+
+.users-management-view__tenant-name {
+  font-size: var(--font-size-sm);
+  color: rgb(var(--color-text-primary));
+  font-weight: var(--font-weight-medium);
+}
+
+.users-management-view__tenant-name--none {
+  color: rgb(var(--color-text-secondary));
+  font-style: italic;
 }
 
 .users-management-view__badge {

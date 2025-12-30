@@ -73,6 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
   const setUser = (userData) => {
     user.value = userData
     isAuthenticated.value = !!userData
+    // Note: Tenant initialization is handled in App.vue after auth loads
   }
   
   const setTokens = (accessToken, refreshTokenValue) => {
@@ -100,15 +101,46 @@ export const useAuthStore = defineStore('auth', () => {
     // This allows the app to work without authentication during development
     // In a real app, you'd validate the token and fetch user data from API
     if (!user.value) {
-      setUser({
-        id: '1',
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        role: USER_ROLES.SUPER_ADMIN,
-        permissions: [],
-        tenantId: null, // Super admin doesn't belong to a tenant
-        avatar: null
-      })
+      // Check if we should simulate Acme Corporation user or Super Admin
+      const simulateTenantUser = localStorage.getItem('simulate_tenant_user') === 'true'
+      
+      if (simulateTenantUser) {
+        // Simulate Acme Corporation tenant user
+        setUser({
+          id: '1',
+          name: 'John Doe',
+          email: 'john.doe@acme.com',
+          role: USER_ROLES.TENANT_ADMIN,
+          permissions: [],
+          tenantId: 'tenant-1',
+          tenantName: 'Acme Corporation',
+          tenantSlug: 'acme',
+          tenantSettings: {},
+          tenantFeatures: ['analytics', 'integrations', 'advanced_reporting'],
+          tenantLimits: {
+            maxUsers: 50,
+            maxStorage: 100,
+            maxApiCalls: 100000
+          },
+          tenantTheme: {},
+          tenantSubscription: {
+            plan: 'Professional',
+            status: 'active'
+          },
+          avatar: null
+        })
+      } else {
+        // Default: Super Admin (can see all tenants)
+        setUser({
+          id: '1',
+          name: 'Super Admin',
+          email: 'admin@platform.com',
+          role: USER_ROLES.SUPER_ADMIN,
+          permissions: [],
+          tenantId: null, // Super admin doesn't belong to a tenant
+          avatar: null
+        })
+      }
       // Set token if not already set
       if (!token.value) {
         token.value = 'dev-token'
