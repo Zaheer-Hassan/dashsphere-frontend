@@ -11,6 +11,7 @@ import { useTheme } from '@/composables/useTheme'
 import { useTenant } from '@/composables/useTenant'
 import { useNotifications } from '@/composables/useNotifications'
 import { usePermissions } from '@/composables/usePermissions'
+import { USER_ROLES } from '@/constants'
 import IconBase from '../base/IconBase.vue'
 import BaseButton from '../base/BaseButton.vue'
 import BaseDropdown from '../base/BaseDropdown.vue'
@@ -83,6 +84,12 @@ const navigationItems = computed(() => {
       path: '/audit-logs',
       icon: 'file-text',
       show: permissions.canViewAuditLogs.value
+    },
+    {
+      name: 'Projects / Modules',
+      path: '/projects',
+      icon: 'package',
+      show: userRole.value === USER_ROLES.SUPER_ADMIN
     },
     {
       name: 'Notifications',

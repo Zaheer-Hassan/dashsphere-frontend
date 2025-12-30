@@ -77,7 +77,14 @@ export const PERMISSIONS = {
   AUDIT_LOGS_CREATE: 'audit_logs:create',
   AUDIT_LOGS_EDIT: 'audit_logs:edit',
   AUDIT_LOGS_DELETE: 'audit_logs:delete',
-  AUDIT_LOGS_EXPORT: 'audit_logs:export'
+  AUDIT_LOGS_EXPORT: 'audit_logs:export',
+  
+  // Projects / Modules (CRUD)
+  PROJECTS_VIEW: 'projects:view',
+  PROJECTS_CREATE: 'projects:create',
+  PROJECTS_EDIT: 'projects:edit',
+  PROJECTS_DELETE: 'projects:delete',
+  PROJECTS_MANAGE: 'projects:manage'
 }
 
 // Role hierarchy - defines which roles inherit permissions from others
@@ -146,7 +153,10 @@ export const ROLE_PERMISSIONS = {
     PERMISSIONS.NOTIFICATIONS_VIEW,
     PERMISSIONS.NOTIFICATIONS_MANAGE,
     // Audit Logs
-    PERMISSIONS.AUDIT_LOGS_VIEW
+    PERMISSIONS.AUDIT_LOGS_VIEW,
+    // Projects / Modules
+    PERMISSIONS.PROJECTS_VIEW,
+    PERMISSIONS.PROJECTS_MANAGE
   ],
   
   [USER_ROLES.MANAGER]: [

@@ -63,6 +63,9 @@ export function usePermissions() {
   const canViewAuditLogs = computed(() => can(PERMISSIONS.AUDIT_LOGS_VIEW))
   const canExportAuditLogs = computed(() => can(PERMISSIONS.AUDIT_LOGS_EXPORT))
   
+  const canViewProjects = computed(() => can(PERMISSIONS.PROJECTS_VIEW))
+  const canManageProjects = computed(() => can(PERMISSIONS.PROJECTS_MANAGE))
+  
   return {
     // Generic permission checks
     can,
@@ -105,6 +108,10 @@ export function usePermissions() {
     // Audit permissions
     canViewAuditLogs,
     canExportAuditLogs,
+    
+    // Projects / Modules permissions
+    canViewProjects,
+    canManageProjects,
     
     // Constants
     PERMISSIONS
