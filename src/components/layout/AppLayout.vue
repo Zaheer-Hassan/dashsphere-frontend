@@ -79,6 +79,12 @@ const navigationItems = computed(() => {
       show: permissions.canViewIntegrations.value
     },
     {
+      name: 'Activity / Audit Logs',
+      path: '/audit-logs',
+      icon: 'file-text',
+      show: permissions.canViewAuditLogs.value
+    },
+    {
       name: 'Notifications',
       path: '/notifications',
       icon: 'bell',

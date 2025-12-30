@@ -98,6 +98,16 @@ const routes = [
     },
   },
   {
+    path: "/audit-logs",
+    name: "AuditLogs",
+    component: () => import("@/views/audit/AuditLogsView.vue"),
+    meta: {
+      requiresAuth: true,
+      permissions: [PERMISSIONS.AUDIT_LOGS_VIEW],
+      title: "Activity / Audit Logs",
+    },
+  },
+  {
     path: "/profile",
     name: "Profile",
     component: () => import("@/views/settings/ProfileView.vue"),
