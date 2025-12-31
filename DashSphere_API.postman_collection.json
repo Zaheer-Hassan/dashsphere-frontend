@@ -1,0 +1,1672 @@
+{
+	"info": {
+		"_postman_id": "dashsphere-api-collection",
+		"name": "DashSphere API Collection",
+		"description": "Complete API collection for DashSphere Multi-Tenant SaaS Platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('auth_token', response.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"tenant_name\": \"Acme Corporation\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('auth_token', response.data.token);",
+									"        pm.environment.set('user_id', response.data.user.id);",
+									"        if (response.data.user.tenant) {",
+									"            pm.environment.set('tenant_id', response.data.user.tenant.id);",
+									"        }",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@dashsphere.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.environment.set('auth_token', response.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "refresh"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgot-password",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "forgot-password"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"token\": \"reset_token_here\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "reset-password"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/stats",
+							"host": ["{{base_url}}"],
+							"path": ["dashboard", "stats"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Analytics",
+			"item": [
+				{
+					"name": "Get Daily Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/analytics/daily?start_date=2024-01-01&end_date=2024-01-31",
+							"host": ["{{base_url}}"],
+							"path": ["analytics", "daily"],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Weekly Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/analytics/weekly?start_date=2024-01-01&end_date=2024-01-31",
+							"host": ["{{base_url}}"],
+							"path": ["analytics", "weekly"],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/analytics/export?format=csv&start_date=2024-01-01&end_date=2024-01-31",
+							"host": ["{{base_url}}"],
+							"path": ["analytics", "export"],
+							"query": [
+								{
+									"key": "format",
+									"value": "csv"
+								},
+								{
+									"key": "start_date",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "end_date",
+									"value": "2024-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?page=1&per_page=20&search=&status=all&role=",
+							"host": ["{{base_url}}"],
+							"path": ["users"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": "all"
+								},
+								{
+									"key": "role",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Jane Doe\",\n    \"email\": \"jane@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"role\": \"manager\",\n    \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Jane Doe Updated\",\n    \"email\": \"jane@example.com\",\n    \"role\": \"manager\",\n    \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invite User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newuser@example.com\",\n    \"role\": \"user\",\n    \"message\": \"Welcome to our platform!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/invite",
+							"host": ["{{base_url}}"],
+							"path": ["users", "invite"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset User Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/:id/reset-password",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id", "reset-password"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/:id/deactivate",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id", "deactivate"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/:id/activate",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id", "activate"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role Management",
+			"item": [
+				{
+					"name": "List Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": ["{{base_url}}"],
+							"path": ["roles"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Custom Manager\",\n    \"permissions\": [\"users:view\", \"users:create\", \"analytics:view\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": ["{{base_url}}"],
+							"path": ["roles"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Custom Manager Updated\",\n    \"permissions\": [\"users:view\", \"users:create\", \"users:edit\", \"analytics:view\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["roles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{role_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["roles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{role_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tenant Management",
+			"item": [
+				{
+					"name": "List Tenants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tenants?page=1&per_page=20&search=&status=&plan=",
+							"host": ["{{base_url}}"],
+							"path": ["tenants"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "plan",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tenant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Corporation\",\n    \"domain\": \"newcorp.com\",\n    \"subdomain\": \"newcorp\",\n    \"email\": \"admin@newcorp.com\",\n    \"plan\": \"professional\",\n    \"max_users\": 50,\n    \"max_storage\": 1000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/tenants",
+							"host": ["{{base_url}}"],
+							"path": ["tenants"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tenant",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"New Corporation Updated\",\n    \"domain\": \"newcorp.com\",\n    \"subdomain\": \"newcorp\",\n    \"email\": \"admin@newcorp.com\",\n    \"plan\": \"enterprise\",\n    \"max_users\": 100,\n    \"max_storage\": 2000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/tenants/:id",
+							"host": ["{{base_url}}"],
+							"path": ["tenants", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{tenant_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tenant",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tenants/:id",
+							"host": ["{{base_url}}"],
+							"path": ["tenants", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{tenant_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Tenant Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tenants/:id/toggle-status",
+							"host": ["{{base_url}}"],
+							"path": ["tenants", ":id", "toggle-status"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{tenant_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tenant Analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/tenants/:id/analytics",
+							"host": ["{{base_url}}"],
+							"path": ["tenants", ":id", "analytics"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{tenant_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Billing & Subscription",
+			"item": [
+				{
+					"name": "Get Current Plan",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/billing/current-plan",
+							"host": ["{{base_url}}"],
+							"path": ["billing", "current-plan"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/billing/payments?page=1&per_page=20",
+							"host": ["{{base_url}}"],
+							"path": ["billing", "payments"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Invoices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/billing/invoices?page=1&per_page=20",
+							"host": ["{{base_url}}"],
+							"path": ["billing", "invoices"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download Invoice PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/pdf"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/billing/invoices/:id/download",
+							"host": ["{{base_url}}"],
+							"path": ["billing", "invoices", ":id", "download"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{invoice_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payment Method",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"is_default\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/billing/payment-methods/:id",
+							"host": ["{{base_url}}"],
+							"path": ["billing", "payment-methods", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{payment_method_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Payment Method",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"card\",\n    \"provider\": \"stripe\",\n    \"token\": \"stripe_token_here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/billing/payment-methods",
+							"host": ["{{base_url}}"],
+							"path": ["billing", "payment-methods"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Plan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"plan_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/billing/change-plan",
+							"host": ["{{base_url}}"],
+							"path": ["billing", "change-plan"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Integrations",
+			"item": [
+				{
+					"name": "List Integrations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/integrations?category=&status=",
+							"host": ["{{base_url}}"],
+							"path": ["integrations"],
+							"query": [
+								{
+									"key": "category",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Integration Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/integrations/:id",
+							"host": ["{{base_url}}"],
+							"path": ["integrations", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{integration_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Configure Integration",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"enabled\": true,\n    \"environment\": \"production\",\n    \"config\": {\n        \"api_key\": \"your_api_key\",\n        \"secret_key\": \"your_secret_key\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/integrations/:id/configure",
+							"host": ["{{base_url}}"],
+							"path": ["integrations", ":id", "configure"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{integration_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Integration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/integrations/:id/toggle",
+							"host": ["{{base_url}}"],
+							"path": ["integrations", ":id", "toggle"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{integration_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Integration Connection",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/integrations/:id/test",
+							"host": ["{{base_url}}"],
+							"path": ["integrations", ":id", "test"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{integration_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Settings",
+			"item": [
+				{
+					"name": "Get Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/settings",
+							"host": ["{{base_url}}"],
+							"path": ["settings"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Settings",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"theme\": \"dark\",\n    \"language\": \"en\",\n    \"notifications\": {\n        \"email\": true,\n        \"push\": false\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/settings",
+							"host": ["{{base_url}}"],
+							"path": ["settings"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe Updated\",\n    \"avatar\": \"base64_image_or_url\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/settings/profile",
+							"host": ["{{base_url}}"],
+							"path": ["settings", "profile"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"oldpassword\",\n    \"password\": \"newpassword\",\n    \"password_confirmation\": \"newpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/settings/change-password",
+							"host": ["{{base_url}}"],
+							"path": ["settings", "change-password"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "List Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications?page=1&per_page=20&unread_only=false",
+							"host": ["{{base_url}}"],
+							"path": ["notifications"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								},
+								{
+									"key": "unread_only",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/:id/read",
+							"host": ["{{base_url}}"],
+							"path": ["notifications", ":id", "read"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{notification_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark All Notifications as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/read-all",
+							"host": ["{{base_url}}"],
+							"path": ["notifications", "read-all"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/unread-count",
+							"host": ["{{base_url}}"],
+							"path": ["notifications", "unread-count"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Audit Logs",
+			"item": [
+				{
+					"name": "List Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/audit-logs?page=1&per_page=20&user_id=&action_type=&severity=&start_date=&end_date=&search=",
+							"host": ["{{base_url}}"],
+							"path": ["audit-logs"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								},
+								{
+									"key": "user_id",
+									"value": ""
+								},
+								{
+									"key": "action_type",
+									"value": ""
+								},
+								{
+									"key": "severity",
+									"value": ""
+								},
+								{
+									"key": "start_date",
+									"value": ""
+								},
+								{
+									"key": "end_date",
+									"value": ""
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Log Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/audit-logs/:id",
+							"host": ["{{base_url}}"],
+							"path": ["audit-logs", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{audit_log_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/audit-logs/export?format=csv&start_date=&end_date=",
+							"host": ["{{base_url}}"],
+							"path": ["audit-logs", "export"],
+							"query": [
+								{
+									"key": "format",
+									"value": "csv"
+								},
+								{
+									"key": "start_date",
+									"value": ""
+								},
+								{
+									"key": "end_date",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Projects / Modules",
+			"item": [
+				{
+					"name": "List Modules",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/projects/modules?category=&status=&search=",
+							"host": ["{{base_url}}"],
+							"path": ["projects", "modules"],
+							"query": [
+								{
+									"key": "category",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Module Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/projects/modules/:id",
+							"host": ["{{base_url}}"],
+							"path": ["projects", "modules", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{module_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Configure Module",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenant_id\": 1,\n    \"enabled\": true,\n    \"config\": {\n        \"setting1\": \"value1\",\n        \"setting2\": \"value2\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/projects/modules/:id/configure",
+							"host": ["{{base_url}}"],
+							"path": ["projects", "modules", ":id", "configure"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{module_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Module",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tenant_id\": 1,\n    \"enabled\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/projects/modules/:id/toggle",
+							"host": ["{{base_url}}"],
+							"path": ["projects", "modules", ":id", "toggle"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{module_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Status code is 200 or 201\", function () {",
+					"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+					"});",
+					"",
+					"pm.test(\"Response has standard format\", function () {",
+					"    const jsonData = pm.response.json();",
+					"    pm.expect(jsonData).to.have.property('status_code');",
+					"    pm.expect(jsonData).to.have.property('message');",
+					"    pm.expect(jsonData).to.have.property('error');",
+					"    pm.expect(jsonData).to.have.property('data');",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		}
+	]
+}
+
